@@ -17,5 +17,8 @@ public interface IUserService {
 	
 	boolean checkExistPhone(String phone);
 	UserModel FindByEmail(String email);
+	
+	UserModel findById(int id);
+	void update(UserModel user);
 
 }

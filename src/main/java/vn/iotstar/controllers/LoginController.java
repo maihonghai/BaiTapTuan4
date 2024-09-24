@@ -64,8 +64,8 @@ public class LoginController extends HttpServlet {
 	}
 	 private void handleLogin(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 	        // Lấy tham số từ view
-	        String username = req.getParameter("uname");
-	        String password = req.getParameter("psw");
+	        String username = req.getParameter("username");
+	        String password = req.getParameter("password");
 	        String remember = req.getParameter("remember");
 
 	        // Kiểm tra tham số
@@ -87,7 +87,9 @@ public class LoginController extends HttpServlet {
 	            if (isRememberMe) {
 	                saveRememberMe(resp, username);
 	            }
+	            
 	            resp.sendRedirect(req.getContextPath() + "/waiting");
+	        
 	        } else {
 	            alertMsg = "Tài khoản hoặc mật khẩu không đúng";
 	            req.setAttribute("alert", alertMsg);

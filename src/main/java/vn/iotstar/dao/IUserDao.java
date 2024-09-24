@@ -10,6 +10,8 @@ public interface IUserDao {
 	
 	UserModel findById(int id);
 	
+	void update(UserModel user);
+	
 	void insert(UserModel user);
 	
 	

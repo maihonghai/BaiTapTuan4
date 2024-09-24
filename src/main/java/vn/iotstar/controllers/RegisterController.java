@@ -47,6 +47,7 @@ public class RegisterController extends HttpServlet {
 		String email = req.getParameter("email");
 		String fullname = req.getParameter("fullname");
 		String phone = req.getParameter("phone");
+		String cfpassword = req.getParameter("confirmpassword");
 		IUserService service = new UserServiceImpl();
 		String alertMsg = "";
 
@@ -62,6 +63,13 @@ public class RegisterController extends HttpServlet {
 			req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
 			return;
 		}
+		if (!cfpassword.equals(password)) {
+		    alertMsg = "Xác nhận lại mật khẩu!";
+		    req.setAttribute("alert", alertMsg);
+		    req.getRequestDispatcher(Constant.Path.REGISTER).forward(req, resp);
+		    return;
+		}
+
 		boolean isSuccess = service.register(email, password, username, fullname, phone);
 		if (isSuccess) {
 			//SendMail sm = new SendMail();

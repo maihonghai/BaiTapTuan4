@@ -1,9 +1,10 @@
-package vn.iotstar.dao.impl;
+package vn.iotstar.dao.impl; 
 
 import java.sql.Connection;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -48,13 +49,13 @@ public class UserDaoImpl extends DBConnectSQL implements IUserDao {
 	public UserModel findById(int id) {
 
 		String sql = "SELECT * FROM Users WHERE id = ? ";
+		UserModel user = new UserModel();
 		try {
 			conn = new DBConnectSQL().getConnection();
 			ps = conn.prepareStatement(sql);
 			ps.setInt(1, id);
 			rs = ps.executeQuery();
 			while (rs.next()) {
-				UserModel user = new UserModel();
 				user.setId(rs.getInt("id"));
 				user.setUserName(rs.getString("username"));
 				user.setFullName(rs.getString("fullname"));
@@ -64,12 +65,11 @@ public class UserDaoImpl extends DBConnectSQL implements IUserDao {
 				user.setRoleid(Integer.parseInt(rs.getString("roleid")));
 				user.setPhone(rs.getString("phone"));
 				user.setCreatedDate(rs.getDate("createDate"));
-				return user;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		return user;
 	}
 
 	@Override
@@ -205,6 +205,28 @@ public class UserDaoImpl extends DBConnectSQL implements IUserDao {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	@Override
+	public void update(UserModel user) {
+		String sql = "UPDATE Users SET fullname = ?, images = ?, phone = ? WHERE id = ?";
+
+	    try {
+	    	conn = new DBConnectSQL().getConnection();
+			ps = conn.prepareStatement(sql);
+	        // Thiết lập các tham số cho câu lệnh SQL
+	        ps.setString(1, user.getFullName());
+	        ps.setString(2, user.getImages());
+	        ps.setString(3, user.getPhone());
+	        ps.setInt(4, user.getId());
+	    
+
+	        ps.executeUpdate(); // Thực thi câu lệnh SQL
+	        conn.close();
+	    } catch (Exception e) {
+	        e.printStackTrace(); // Ghi log lỗi
+	    } 
+		
 	}
 
 }

@@ -7,5 +7,5 @@
 session.invalidate(); 
 
 // Redirecting to the login page or home page after logout
-response.sendRedirect("/ltweb/views/login.jsp"); 
+response.sendRedirect("/ltweb/login"); 
 %>

@@ -58,6 +58,30 @@ public class UserServiceImpl implements IUserService  {
 		// TODO Auto-generated method stub
 		return userDao.FindByEmail(email);
 	}
+
+	@Override
+	public UserModel findById(int id) {
+		return userDao.findById(id);
+	}
+
+	@Override
+	public void update(UserModel user) {
+		UserModel oldU = userDao.findById(user.getId());
+		// Cập nhật các thuộc tính từ đối tượng user mới vào oldU
+	    if (oldU != null) {
+	        oldU.setUserName(user.getUserName());
+	        oldU.setPassWord(user.getPassWord());
+	        oldU.setEmail(user.getEmail());
+	        oldU.setFullName(user.getFullName());
+	        oldU.setImages(user.getImages());
+	        oldU.setRoleid(user.getRoleid());
+	        oldU.setPhone(user.getPhone());
+	        oldU.setCreatedDate(user.getCreatedDate()); // Nếu cần thiết
+	        
+	        userDao.update(oldU); // Gọi phương thức update để lưu thay đổi vào DB
+	    }
+		
+	}
 	
 	
 
