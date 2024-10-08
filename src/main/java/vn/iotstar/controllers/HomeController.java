@@ -1,5 +1,7 @@
 package vn.iotstar.controllers;
 
+import static vn.iotstar.utils.Constant.DIR;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,88 +22,97 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
+import vn.iotstar.models.CategoryModel;
 import vn.iotstar.models.UserModel;
+import vn.iotstar.utils.Constant;
 import vn.iotstar.Service.IUserService;
 import vn.iotstar.Service.impl.UserServiceImpl;
 import vn.iotstar.dao.impl.UserDaoImpl;
 
-@WebServlet(urlPatterns = { "/home", "/profile" })
-@MultipartConfig(fileSizeThreshold = 1024*1024*10, maxFileSize = 1024*1024*50,maxRequestSize= 1024*1024*50)
+
+@WebServlet(urlPatterns = { "/home","/home/profiles", "/home/profile/update" })
+@MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 1024 * 1024 * 5, maxRequestSize = 1024 * 1024 * 5 * 5)
 
 public class HomeController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	IUserService userService = new UserServiceImpl();
 	
-
-	@Override
+		@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
-		String requestUri = req.getRequestURI();
+			String url = req.getRequestURI();
+			req.setCharacterEncoding("UTF-8");
+			resp.setCharacterEncoding("UTF-8");
 
-		if (requestUri.endsWith("/profile")) {
+		if (url.contains("profiles")) {
 			int id = Integer.parseInt(req.getParameter("id"));
 			
 			UserModel user = userService.findById(id);
-			 if (user != null) {
-		            req.setAttribute("user", user);
-		            RequestDispatcher rd = req.getRequestDispatcher("/views/profile.jsp");
-		            rd.forward(req, resp);
-		        } else {
-		            // Xử lý trường hợp không tìm thấy người dùng
-		            req.setAttribute("alert", "Không tìm thấy người dùng!");
-		            req.getRequestDispatcher("/views/home.jsp").forward(req, resp);
-		        }
-		} else if (requestUri.endsWith("/home")) {
+			req.setAttribute("user", user);
+			
+			req.getRequestDispatcher("/views/profile.jsp").forward(req, resp);
+		} else if (url.contains("/home")) {
 			req.getRequestDispatcher("/views/home.jsp").forward(req, resp);
 		}
 
 	}
 
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-		update(req, resp);
+		String url = req.getRequestURI();
+		req.setCharacterEncoding("UTF-8");
+		 resp.setCharacterEncoding("UTF-8");
+		 if(url.contains("update")){
+			 update(req, resp);
+	    	}
+		
 
 	}
-
 	private void update(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
-	    req.setCharacterEncoding("UTF-8");
-	    resp.setCharacterEncoding("UTF-8");
-	    
-
+	
 	    // Lấy thông tin từ form
 	    String name = req.getParameter("fullname");
 	    String phone = req.getParameter("phone");
-	    String image = req.getParameter("images");
 	    int id = Integer.parseInt(req.getParameter("id"));
-
-	    System.out.println(name);
 
 	    // Tạo model User và cập nhật thông tin
 	    UserModel user = new UserModel();
 	    user.setId(id);
 	    user.setFullName(name);
 	    user.setPhone(phone);
-	    user.setImages(image); // Lưu đường dẫn ảnh vào database
+	    //user.setImages(image); // Lưu đường dẫn ảnh vào database
 
-	    // Cập nhật thông tin người dùng
-	    boolean isUpdateSuccessful = true;
-	    try {
-	        userService.update(user);
-	    } catch (Exception e) {
-	        isUpdateSuccessful = false;
-	        e.printStackTrace();
-	    }
-
-	    // Thông báo kết quả cập nhật
-	    String alert = isUpdateSuccessful ? "Cập nhật thông tin thành công!" : "Cập nhật thông tin thất bại!";
-	    req.setAttribute("alert", alert);
-	    req.setAttribute("user", user);
-
-	    // Điều hướng về trang profile
-	    //req.getRequestDispatcher("/views/profile.jsp").forward(req, resp);
-	    resp.sendRedirect(req.getContextPath() + "/home");
+	  //Luu hinh cu
+		UserModel userold = userService.findById(id);
+		String fileold =  userold.getImages();
+		//xu ly images
+		String fname="";
+		String uploadPath= DIR;
+		File uploadDir= new File(uploadPath);
+		if(!uploadDir.exists()) {
+			uploadDir.mkdir();
+		}
+		try {
+			Part part=req.getPart("images");
+			if(part.getSize()>0) {
+				String filename=Paths.get(part.getSubmittedFileName()).getFileName().toString();
+				//doi ten file
+				int index=filename.lastIndexOf(".");
+				String ext=filename.substring(index+1);
+				fname = System.currentTimeMillis()+"."+ext;
+				//upload file
+				part.write(uploadPath + "/" + fname);
+				//ghi teen file vao data
+				user.setImages(fname);
+			}else {
+				user.setImages(fileold);
+			}
+		}catch(Exception e) {
+			e.printStackTrace();    		
+		}	
+		
+		userService.update(user);
+		resp.sendRedirect(req.getContextPath()+ "/home");
+	
 
 	}
-
-
 }

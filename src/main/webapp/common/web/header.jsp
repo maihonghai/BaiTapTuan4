@@ -40,8 +40,9 @@
 							</c:when>
 							<c:otherwise>
 								<li><a
-									href="${pageContext.request.contextPath }/profile?id=${sessionScope.account.id}">${sessionScope.account.fullName}</a>
+									href="${pageContext.request.contextPath }/home/profiles?id=${sessionScope.account.id}">${sessionScope.account.fullName}</a>
 									| <a href="${pageContext.request.contextPath }/logout">Logout</a>
+									
 							</c:otherwise>
 						</c:choose></li>
 				</ul>

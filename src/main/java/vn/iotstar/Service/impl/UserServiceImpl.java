@@ -79,6 +79,10 @@ public class UserServiceImpl implements IUserService  {
 	        oldU.setCreatedDate(user.getCreatedDate()); // Nếu cần thiết
 	        
 	        userDao.update(oldU); // Gọi phương thức update để lưu thay đổi vào DB
+	        System.out.println("User with ID " + user.getId() + " updated successfully");
+	    } else {
+	        System.out.println("User not found with ID: " + user.getId());
+	    
 	    }
 		
 	}
